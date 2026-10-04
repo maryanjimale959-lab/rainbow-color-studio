@@ -169,6 +169,29 @@ select option{background:#14122e;color:#fff}
 .ph-tabs i{width:22px;height:22px;border-radius:7px;background:var(--pline)}
 .ph-tabs i:first-child{background:var(--pprimary)}
 
+/* shades + vision */
+.shade-row{margin-bottom:16px}
+.shade-row:last-child{margin-bottom:0}
+.shade-name{font-size:.9rem;color:var(--muted);margin-bottom:6px}
+.shade-strip{display:grid;grid-template-columns:repeat(10,1fr);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.shade{border:0;border-radius:0;height:76px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;padding:7px 8px;font-size:.78rem;font-weight:600;text-align:left;position:relative;transition:transform .15s}
+.shade:hover{transform:scale(1.07);z-index:1;border-radius:8px}
+.shade small{font-weight:500;opacity:.8;font-size:.68rem}
+.shade.base::after{content:"";position:absolute;top:8px;left:8px;width:8px;height:8px;border-radius:50%;background:currentColor}
+.vis-row{display:grid;grid-template-columns:190px 1fr;gap:14px;align-items:center;margin-bottom:12px}
+.vis-row:last-child{margin-bottom:0}
+.vis-row b{font-weight:600;display:block}
+.vis-row span.d{color:var(--muted);font-size:.82rem}
+.vis-strip{display:flex;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.vis-strip div{flex:1;height:58px;display:flex;align-items:flex-end;padding:6px 8px;font-size:.74rem;font-weight:600}
+.warn{margin-top:18px;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--glass)}
+.warn.bad{border-color:rgba(255,190,90,.45);background:rgba(255,190,90,.08)}
+.warn ul{margin:8px 0 0 18px;color:var(--muted);font-size:.92rem}
+.toggles select{width:auto;min-width:170px}
+.toggles .vsel{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.92rem}
+.seg{flex-wrap:wrap}
+footer.foot a{color:var(--ink);text-underline-offset:3px}
+
 /* gradient */
 .grad-view{height:260px;border-radius:18px;border:1px solid var(--line);margin-top:14px}
 pre.code{background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:14px;padding:16px;overflow:auto;font-size:.85rem;line-height:1.6;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;margin-top:12px;max-height:340px}
@@ -215,6 +238,11 @@ footer.foot strong{color:var(--ink);font-family:var(--display);font-weight:700;f
   .sw .tools button,.sw .tools label{width:32px;height:32px}
   .s-cards{grid-template-columns:1fr}.s-nav,.s-hero{padding-left:18px;padding-right:18px}.s-cards{padding:0 18px 30px}
   .s-links{display:none}
+  .vis-row{grid-template-columns:1fr;gap:6px}
+  .vis-strip div{font-size:.62rem;padding:4px}
+  .shade{height:64px;padding:5px 4px;font-size:.66rem}
+  .shade small{display:none}
+  .shade.base::after{top:5px;left:5px}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
@@ -224,7 +252,7 @@ footer.foot strong{color:var(--ink);font-family:var(--display);font-weight:700;f
   <header class="top">
     <a class="brand" href="#top"><i></i>RAINBOW</a>
     <nav class="links" aria-label="Sections">
-      <a href="#studio">Palette</a><a href="#contrast">Contrast</a><a href="#preview">Preview</a><a href="#gradient">Gradient</a><a href="#image">From image</a><a href="#export">Export</a><a href="#library">Library</a>
+      <a href="#studio">Palette</a><a href="#contrast">Contrast</a><a href="#shades">Shades</a><a href="#vision">Vision</a><a href="#preview">Preview</a><a href="#gradient">Gradient</a><a href="#image">From image</a><a href="#export">Export</a><a href="#library">Library</a>
     </nav>
   </header>
 
@@ -285,12 +313,28 @@ footer.foot strong{color:var(--ink);font-family:var(--display);font-weight:700;f
     </div>
   </section>
 
+  <section class="block" id="shades">
+    <h2>Shade scales for every color</h2>
+    <p class="lead">Each color gets ten steps from 50 (lightest) to 900 (darkest), like Tailwind. The dot marks your original color in the scale. Click a shade to copy it.</p>
+    <div class="panel" style="margin-top:30px"><div id="shadeRows"></div></div>
+  </section>
+
+  <section class="block" id="vision">
+    <h2>See your palette through color blindness</h2>
+    <p class="lead">Around 1 in 12 men and 1 in 200 women see colors differently. Check that your palette still works for them, and that meaning is never carried by color alone.</p>
+    <div class="panel" style="margin-top:30px">
+      <div id="visRows"></div>
+      <div class="warn" id="visWarn"></div>
+    </div>
+  </section>
+
   <section class="block" id="preview">
     <h2>See it on a real screen</h2>
     <p class="lead">Colors are assigned roles automatically: the strongest color becomes the primary, a contrasting one becomes the accent, and the darkest and lightest build the backgrounds.</p>
     <div class="toggles">
       <div class="seg" role="group" aria-label="Preview type"><button data-pv="site" aria-pressed="true">Website</button><button data-pv="app" aria-pressed="false">Mobile app</button></div>
       <div class="seg" role="group" aria-label="Theme"><button data-th="dark" aria-pressed="true">Dark</button><button data-th="light" aria-pressed="false">Light</button></div>
+      <label class="vsel">Vision <select id="pvVision" aria-label="Simulate color vision"><option value="">Normal</option><option value="protan">Protanopia</option><option value="deutan">Deuteranopia</option><option value="tritan">Tritanopia</option><option value="gray">No color</option></select></label>
     </div>
     <div id="pv">
       <div class="site">
@@ -376,9 +420,15 @@ footer.foot strong{color:var(--ink);font-family:var(--display);font-weight:700;f
   </section>
   </main>
 
-  <footer class="foot"><span>Created by <strong>Mariam J</strong></span><span>RAINBOW is a single HTML file, free to use for any project.</span></footer>
+  <footer class="foot"><span>Created by <strong>Mariam J</strong></span><span>RAINBOW is free to use for any project. <a href="https://github.com/maryanjimale959-lab/rainbow-color-studio" target="_blank" rel="noopener">View on GitHub</a></span></footer>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="f-protan"><feColorMatrix type="matrix" values="0.152 1.053 -0.205 0 0  0.115 0.786 0.099 0 0  -0.004 -0.048 1.052 0 0  0 0 0 1 0"/></filter>
+  <filter id="f-deutan"><feColorMatrix type="matrix" values="0.367 0.861 -0.228 0 0  0.280 0.673 0.047 0 0  -0.012 0.043 0.969 0 0  0 0 0 1 0"/></filter>
+  <filter id="f-tritan"><feColorMatrix type="matrix" values="1.256 -0.077 -0.179 0 0  -0.078 0.931 0.148 0 0  0.005 0.691 0.304 0 0  0 0 0 1 0"/></filter>
+  <filter id="f-gray"><feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0"/></filter>
+</svg>
 
 <script>
 (()=>{
@@ -427,7 +477,7 @@ const PRESETS=[
   {name:'Ocean',c:['#03045E','#0077B6','#00B4D8','#90E0EF','#CAF0F8']},
   {name:'Forest',c:['#1B4332','#2D6A4F','#52B788','#B7E4C7','#F1F8E9']}
 ];
-const state={mode:'analogous',base:{h:262,s:.62,v:.9},palette:[],pv:'site',th:'dark',fmt:'CSS',cx:{fg:6,bg:0},extracted:[]};
+const state={mode:'analogous',base:{h:262,s:.62,v:.9},palette:[],pv:'site',th:'dark',fmt:'CSS',cx:{fg:6,bg:0},extracted:[],vision:''};
 const baseHex=()=>toHex(...hsvToRgb(state.base.h,state.base.s,state.base.v));
 
 function generate(){
@@ -517,6 +567,59 @@ function renderSwatches(){
   });
 }
 
+/* ---------- shades ---------- */
+const STEPS=[50,100,200,300,400,500,600,700,800,900];
+const L_TARGET=[96,91,82,72,62,52,42,32,22,13];
+function shades(hex){
+  const[h,s,l]=hsl(hex);let near=0,best=1e9;
+  L_TARGET.forEach((t,i)=>{const d=Math.abs(t-l);if(d<best){best=d;near=i}});
+  return STEPS.map((step,i)=>i===near?{step,hex,base:true}:{step,hex:hslHex(h,L_TARGET[i]>=90?s*.8:s,L_TARGET[i])});
+}
+function renderShades(){
+  const box=$('#shadeRows');box.innerHTML='';
+  state.palette.forEach((p,i)=>{
+    const row=document.createElement('div');row.className='shade-row';
+    row.innerHTML=`<div class="shade-name">Color ${i+1}</div>`;
+    const strip=document.createElement('div');strip.className='shade-strip';
+    shades(p.hex).forEach(sh=>{
+      const b=document.createElement('button');b.className='shade'+(sh.base?' base':'');b.style.background=sh.hex;b.style.color=bestText(sh.hex);
+      b.setAttribute('aria-label',`Copy color ${i+1} shade ${sh.step}, ${sh.hex}`);
+      b.innerHTML=`${sh.step}<small>${sh.hex.slice(1).toUpperCase()}</small>`;
+      b.addEventListener('click',()=>copy(sh.hex.toUpperCase(),'Copied '+sh.hex.toUpperCase()));
+      strip.appendChild(b);
+    });
+    row.appendChild(strip);box.appendChild(row);
+  });
+}
+
+/* ---------- color vision simulation ---------- */
+const VISION={
+  protan:{name:'Protanopia',d:'No red cones',m:[[.152286,1.052583,-.204868],[.114503,.786281,.099216],[-.003882,-.048116,1.051998]]},
+  deutan:{name:'Deuteranopia',d:'No green cones',m:[[.367322,.860646,-.227968],[.280085,.672501,.047413],[-.011820,.042940,.968881]]},
+  tritan:{name:'Tritanopia',d:'No blue cones',m:[[1.255528,-.076749,-.178779],[-.078411,.930809,.147602],[.004733,.691367,.303900]]},
+  gray:{name:'No color',d:'Achromatopsia',m:[[.2126,.7152,.0722],[.2126,.7152,.0722],[.2126,.7152,.0722]]}
+};
+const toLin=v=>{v/=255;return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4)};
+const toSrgb=v=>{v=clamp(v,0,1);return 255*(v<=.0031308?12.92*v:1.055*Math.pow(v,1/2.4)-.055)};
+function simulate(hex,type){
+  const c=hexToRgb(hex).map(toLin),m=VISION[type].m;
+  return toHex(...m.map(r=>toSrgb(r[0]*c[0]+r[1]*c[1]+r[2]*c[2])));
+}
+const rgbDist=(a,b)=>{const x=hexToRgb(a),y=hexToRgb(b);return Math.hypot(x[0]-y[0],x[1]-y[1],x[2]-y[2])};
+function renderVision(){
+  const cols=state.palette.map(p=>p.hex),rows=[['Normal vision','Most people',cols],...Object.entries(VISION).map(([k,v])=>[v.name,v.d,cols.map(c=>simulate(c,k))])];
+  $('#visRows').innerHTML=rows.map(([n,d,list])=>`<div class="vis-row"><div><b>${n}</b><span class="d">${d}</span></div><div class="vis-strip">${list.map(c=>`<div style="background:${c};color:${bestText(c)}">${c.slice(1).toUpperCase()}</div>`).join('')}</div></div>`).join('');
+  const issues=[];
+  Object.entries(VISION).forEach(([k,v])=>{
+    const sim=cols.map(c=>simulate(c,k));
+    for(let i=0;i<cols.length;i++)for(let j=i+1;j<cols.length;j++)
+      if(rgbDist(cols[i],cols[j])>=70&&rgbDist(sim[i],sim[j])<40)issues.push(`Colors ${i+1} and ${j+1} look almost the same with ${v.name.toLowerCase()}.`);
+  });
+  const w=$('#visWarn');w.classList.toggle('bad',issues.length>0);
+  w.innerHTML=issues.length?`<b>Watch out for these pairs</b><ul>${issues.map(t=>`<li>${t}</li>`).join('')}</ul><div style="margin-top:8px;color:var(--muted);font-size:.92rem">Add a lightness difference, an icon or a label so they stay distinguishable.</div>`:'<b>No problem pairs found.</b> Every pair of colors that looks different in normal vision still looks different in these four simulations.';
+}
+$('#pvVision').addEventListener('change',e=>{state.vision=e.target.value;renderPreview()});
+
 /* ---------- contrast ---------- */
 function cxOptions(){return[...state.palette.map((p,i)=>({v:p.hex,t:`Color ${i+1} (${p.hex.toUpperCase()})`})),{v:'#ffffff',t:'White (#FFFFFF)'},{v:'#000000',t:'Black (#000000)'}]}
 function renderContrast(){
@@ -554,7 +657,7 @@ function roles(dark){
 }
 function renderPreview(){
   const pv=$('#pv');Object.entries(roles(state.th==='dark')).forEach(([k,v])=>pv.style.setProperty(k,v));
-  pv.classList.toggle('is-app',state.pv==='app');
+  pv.classList.toggle('is-app',state.pv==='app');pv.style.filter=state.vision?`url(#f-${state.vision})`:'';
   $$('[data-pv]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.pv===state.pv));
   $$('[data-th]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.th===state.th));
 }
@@ -587,6 +690,8 @@ const FORMATS={
   Tailwind:h=>`// tailwind.config.js\nmodule.exports = {\n  theme: {\n    extend: {\n      colors: {\n        brand: {\n${h.map((c,i)=>`          ${i+1}: '${c}',`).join('\n')}\n        },\n      },\n    },\n  },\n};\n// usage: bg-brand-1  text-brand-3`,
   JSON:h=>JSON.stringify({palette:Object.fromEntries(h.map((c,i)=>['color-'+(i+1),c]))},null,2),
   Flutter:h=>`import 'package:flutter/material.dart';\n\nclass AppColors {\n${h.map((c,i)=>`  static const Color color${i+1} = Color(0xFF${c.slice(1).toUpperCase()});`).join('\n')}\n}`,
+  'CSS shades':h=>`:root {\n${h.map((c,i)=>shades(c).map(x=>`  --color-${i+1}-${x.step}: ${x.hex};`).join('\n')).join('\n\n')}\n}`,
+  'Tailwind shades':h=>`// tailwind.config.js\nmodule.exports = {\n  theme: {\n    extend: {\n      colors: {\n${h.map((c,i)=>`        'color-${i+1}': {\n${shades(c).map(x=>`          ${x.step}: '${x.hex}',`).join('\n')}\n        },`).join('\n')}\n      },\n    },\n  },\n};\n// usage: bg-color-1-500  text-color-3-100`,
   Android:h=>`<?xml version="1.0" encoding="utf-8"?>\n<resources>\n${h.map((c,i)=>`    <color name="color_${i+1}">${c.toUpperCase()}</color>`).join('\n')}\n</resources>`
 };
 const seg=$('#fmtSeg');
@@ -693,7 +798,7 @@ function render(keepHexInput,skipDots){
   $$('.pill',hBox).forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===state.mode));
   $('#baseChip').style.background=baseHex();
   if(!keepHexInput)$('#hexIn').value=baseHex().toUpperCase();
-  renderSwatches();renderDots();renderContrast();renderPreview();renderGradient();renderExport();applyGlow();updateHash();
+  renderSwatches();renderDots();renderContrast();renderShades();renderVision();renderPreview();renderGradient();renderExport();applyGlow();updateHash();
 }
 
 /* ---------- init ---------- */
